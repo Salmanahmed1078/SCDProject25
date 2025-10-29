@@ -1,0 +1,50 @@
+name: Documentation Build and Publish
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-docs
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure public/docs exists
+        run: |
+          mkdir -p public/docs
+
+      - name: Build docs (Jekyll if configured)
+        run: |
+          if [ -f docs/_config.yml ] || [ -f docs/Gemfile ]; then
+            echo "Jekyll configuration detected; building with Jekyll."
+            sudo apt-get update && sudo apt-get install -y ruby-full build-essential zlib1g-dev
+            gem install bundler jekyll
+            (cd docs && bundle init >/dev/null 2>&1 || true)
+            (cd docs && jekyll build -s . -d ../public/docs)
+          else
+            echo "No Jekyll config; publishing raw docs directory."
+            rsync -a --delete docs/ public/docs/
+          fi
+
+      - name: Upload Pages artifact (site)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+
