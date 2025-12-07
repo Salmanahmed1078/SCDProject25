@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const fileDB = require('./file');
 const recordUtils = require('./record');
 const vaultEvents = require('../events');
@@ -93,4 +95,60 @@ function sortRecords(sortField, sortOrder) {
   return sortedData;
 }
 
-module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords };
+function exportData() {
+  const data = fileDB.readDB();
+  const projectRoot = path.join(__dirname, '../..');
+  const exportFile = path.join(projectRoot, 'export.txt');
+  
+  // Get current date and time
+  const now = new Date();
+  const exportDate = now.toLocaleDateString();
+  const exportTime = now.toLocaleTimeString();
+  const totalRecords = data.length;
+  const fileName = 'export.txt';
+  
+  // Build the export content
+  let content = '';
+  
+  // Header section
+  content += '='.repeat(60) + '\n';
+  content += '                    VAULT DATA EXPORT\n';
+  content += '='.repeat(60) + '\n';
+  content += `Export Date: ${exportDate}\n`;
+  content += `Export Time: ${exportTime}\n`;
+  content += `Total Records: ${totalRecords}\n`;
+  content += `File Name: ${fileName}\n`;
+  content += '='.repeat(60) + '\n\n';
+  
+  // Records section
+  if (totalRecords === 0) {
+    content += 'No records found in the vault.\n';
+  } else {
+    content += 'RECORDS:\n';
+    content += '-'.repeat(60) + '\n';
+    data.forEach((record, index) => {
+      content += `\nRecord ${index + 1}:\n`;
+      content += `  ID: ${record.id}\n`;
+      content += `  Name: ${record.name}\n`;
+      content += `  Value: ${record.value}\n`;
+      if (record.created) {
+        content += `  Created: ${record.created}\n`;
+      }
+      content += '-'.repeat(60) + '\n';
+    });
+  }
+  
+  // Footer
+  content += '\n' + '='.repeat(60) + '\n';
+  content += `End of Export - ${totalRecords} record${totalRecords !== 1 ? 's' : ''} exported\n`;
+  content += '='.repeat(60) + '\n';
+  
+  try {
+    fs.writeFileSync(exportFile, content, 'utf8');
+    return { success: true, filePath: exportFile };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData };

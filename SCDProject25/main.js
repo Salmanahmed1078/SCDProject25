@@ -16,7 +16,8 @@ function menu() {
 4. Delete Record
 5. Search Records
 6. Sort Records
-7. Exit
+7. Export Data
+8. Exit
 =====================
   `);
 
@@ -93,6 +94,16 @@ function menu() {
         break;
 
       case '7':
+        const exportResult = db.exportData();
+        if (exportResult.success) {
+          console.log('✅ Data exported successfully to export.txt');
+        } else {
+          console.log(`❌ Error exporting data: ${exportResult.error}`);
+        }
+        menu();
+        break;
+
+      case '8':
         console.log('👋 Exiting NodeVault...');
         rl.close();
         break;
