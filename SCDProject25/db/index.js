@@ -60,4 +60,37 @@ function searchRecords(searchTerm) {
   return matches;
 }
 
-module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords };
+function sortRecords(sortField, sortOrder) {
+  const data = fileDB.readDB();
+  
+  // Create a copy of the array to avoid modifying the original
+  const sortedData = [...data];
+  
+  // Sort based on the field
+  sortedData.sort((a, b) => {
+    let comparison = 0;
+    
+    if (sortField.toLowerCase() === 'name') {
+      // Sort by name (case-insensitive)
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      if (nameA < nameB) comparison = -1;
+      else if (nameA > nameB) comparison = 1;
+    } else if (sortField.toLowerCase() === 'creation date' || sortField.toLowerCase() === 'date' || sortField.toLowerCase() === 'created') {
+      // Sort by creation date
+      const dateA = a.created || '';
+      const dateB = b.created || '';
+      if (dateA < dateB) comparison = -1;
+      else if (dateA > dateB) comparison = 1;
+    }
+    
+    // Apply sort order (ascending or descending)
+    return sortOrder.toLowerCase() === 'descending' || sortOrder.toLowerCase() === 'desc' 
+      ? -comparison 
+      : comparison;
+  });
+  
+  return sortedData;
+}
+
+module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords };
