@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const fileDB = require('./file');
+const { connectDB } = require('./mongodb');
+const Record = require('./models/Record');
 const recordUtils = require('./record');
 const vaultEvents = require('../events');
 
@@ -13,12 +14,25 @@ if (!fs.existsSync(backupsDir)) {
   fs.mkdirSync(backupsDir, { recursive: true });
 }
 
-function createBackup() {
+// Helper function to convert MongoDB document to plain object with id
+function toPlainObject(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    name: obj.name,
+    value: obj.value,
+    created: obj.created || obj.createdAt ? (obj.created || obj.createdAt.toISOString().split('T')[0]) : new Date().toISOString().split('T')[0]
+  };
+}
+
+async function createBackup() {
   try {
-    const data = fileDB.readDB();
+    await connectDB();
+    const records = await Record.find({});
+    const data = records.map(toPlainObject);
     
     // Generate backup filename with date and time
-    // Format: backup_2025-11-04_15-22-10.json (or with milliseconds if needed)
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -28,11 +42,9 @@ function createBackup() {
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
     
-    // Include milliseconds to ensure uniqueness
     const backupFileName = `backup_${year}-${month}-${day}_${hours}-${minutes}-${seconds}-${milliseconds}.json`;
     const backupFilePath = path.join(backupsDir, backupFileName);
     
-    // Write the backup file with the current vault state
     fs.writeFileSync(backupFilePath, JSON.stringify(data, null, 2), 'utf8');
     
     return { success: true, filePath: backupFilePath, fileName: backupFileName };
@@ -41,164 +53,172 @@ function createBackup() {
   }
 }
 
-function addRecord({ name, value }) {
-  recordUtils.validateRecord({ name, value });
-  const data = fileDB.readDB();
-  const newRecord = { 
-    id: recordUtils.generateId(), 
-    name, 
-    value,
-    created: new Date().toISOString().split('T')[0] // Format: YYYY-MM-DD
-  };
-  data.push(newRecord);
-  fileDB.writeDB(data);
-  
-  // Create automatic backup
-  const backupResult = createBackup();
-  if (backupResult.success) {
-    console.log(`💾 Backup created: ${backupResult.fileName}`);
-  } else {
-    console.log(`⚠️  Backup failed: ${backupResult.error}`);
-  }
-  
-  vaultEvents.emit('recordAdded', newRecord);
-  return newRecord;
-}
-
-function listRecords() {
-  return fileDB.readDB();
-}
-
-function updateRecord(id, newName, newValue) {
-  const data = fileDB.readDB();
-  const record = data.find(r => r.id === id);
-  if (!record) return null;
-  record.name = newName;
-  record.value = newValue;
-  fileDB.writeDB(data);
-  vaultEvents.emit('recordUpdated', record);
-  return record;
-}
-
-function deleteRecord(id) {
-  let data = fileDB.readDB();
-  const record = data.find(r => r.id === id);
-  if (!record) return null;
-  data = data.filter(r => r.id !== id);
-  fileDB.writeDB(data);
-  
-  // Create automatic backup
-  const backupResult = createBackup();
-  if (backupResult.success) {
-    console.log(`💾 Backup created: ${backupResult.fileName}`);
-  } else {
-    console.log(`⚠️  Backup failed: ${backupResult.error}`);
-  }
-  
-  vaultEvents.emit('recordDeleted', record);
-  return record;
-}
-
-function searchRecords(searchTerm) {
-  const data = fileDB.readDB();
-  if (!searchTerm || searchTerm.trim() === '') {
-    return [];
-  }
-  
-  const term = searchTerm.trim().toLowerCase();
-  
-  // Search by name (case-insensitive) or ID (convert to string for comparison)
-  const matches = data.filter(record => {
-    const nameMatch = record.name.toLowerCase().includes(term);
-    const idMatch = String(record.id).includes(term);
-    return nameMatch || idMatch;
-  });
-  
-  return matches;
-}
-
-function sortRecords(sortField, sortOrder) {
-  const data = fileDB.readDB();
-  
-  // Create a copy of the array to avoid modifying the original
-  const sortedData = [...data];
-  
-  // Sort based on the field
-  sortedData.sort((a, b) => {
-    let comparison = 0;
+async function addRecord({ name, value }) {
+  try {
+    await connectDB();
+    recordUtils.validateRecord({ name, value });
     
-    if (sortField.toLowerCase() === 'name') {
-      // Sort by name (case-insensitive)
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      if (nameA < nameB) comparison = -1;
-      else if (nameA > nameB) comparison = 1;
-    } else if (sortField.toLowerCase() === 'creation date' || sortField.toLowerCase() === 'date' || sortField.toLowerCase() === 'created') {
-      // Sort by creation date
-      const dateA = a.created || '';
-      const dateB = b.created || '';
-      if (dateA < dateB) comparison = -1;
-      else if (dateA > dateB) comparison = 1;
+    const newRecord = new Record({
+      name,
+      value,
+      created: new Date().toISOString().split('T')[0]
+    });
+    
+    const savedRecord = await newRecord.save();
+    const recordObj = toPlainObject(savedRecord);
+    
+    // Create automatic backup
+    const backupResult = await createBackup();
+    if (backupResult.success) {
+      console.log(`💾 Backup created: ${backupResult.fileName}`);
+    } else {
+      console.log(`⚠️  Backup failed: ${backupResult.error}`);
     }
     
-    // Apply sort order (ascending or descending)
-    return sortOrder.toLowerCase() === 'descending' || sortOrder.toLowerCase() === 'desc' 
-      ? -comparison 
-      : comparison;
-  });
-  
-  return sortedData;
+    vaultEvents.emit('recordAdded', recordObj);
+    return recordObj;
+  } catch (error) {
+    throw new Error(`Failed to add record: ${error.message}`);
+  }
 }
 
-function exportData() {
-  const data = fileDB.readDB();
-  const projectRoot = path.join(__dirname, '../..');
-  const exportFile = path.join(projectRoot, 'export.txt');
-  
-  // Get current date and time
-  const now = new Date();
-  const exportDate = now.toLocaleDateString();
-  const exportTime = now.toLocaleTimeString();
-  const totalRecords = data.length;
-  const fileName = 'export.txt';
-  
-  // Build the export content
-  let content = '';
-  
-  // Header section
-  content += '='.repeat(60) + '\n';
-  content += '                    VAULT DATA EXPORT\n';
-  content += '='.repeat(60) + '\n';
-  content += `Export Date: ${exportDate}\n`;
-  content += `Export Time: ${exportTime}\n`;
-  content += `Total Records: ${totalRecords}\n`;
-  content += `File Name: ${fileName}\n`;
-  content += '='.repeat(60) + '\n\n';
-  
-  // Records section
-  if (totalRecords === 0) {
-    content += 'No records found in the vault.\n';
-  } else {
-    content += 'RECORDS:\n';
-    content += '-'.repeat(60) + '\n';
-    data.forEach((record, index) => {
-      content += `\nRecord ${index + 1}:\n`;
-      content += `  ID: ${record.id}\n`;
-      content += `  Name: ${record.name}\n`;
-      content += `  Value: ${record.value}\n`;
-      if (record.created) {
-        content += `  Created: ${record.created}\n`;
-      }
-      content += '-'.repeat(60) + '\n';
-    });
-  }
-  
-  // Footer
-  content += '\n' + '='.repeat(60) + '\n';
-  content += `End of Export - ${totalRecords} record${totalRecords !== 1 ? 's' : ''} exported\n`;
-  content += '='.repeat(60) + '\n';
-  
+async function listRecords() {
   try {
+    await connectDB();
+    const records = await Record.find({});
+    return records.map(toPlainObject);
+  } catch (error) {
+    throw new Error(`Failed to list records: ${error.message}`);
+  }
+}
+
+async function updateRecord(id, newName, newValue) {
+  try {
+    await connectDB();
+    const record = await Record.findById(id);
+    if (!record) return null;
+    
+    record.name = newName;
+    record.value = newValue;
+    const updatedRecord = await record.save();
+    
+    vaultEvents.emit('recordUpdated', toPlainObject(updatedRecord));
+    return toPlainObject(updatedRecord);
+  } catch (error) {
+    throw new Error(`Failed to update record: ${error.message}`);
+  }
+}
+
+async function deleteRecord(id) {
+  try {
+    await connectDB();
+    const record = await Record.findById(id);
+    if (!record) return null;
+    
+    const recordObj = toPlainObject(record);
+    await Record.findByIdAndDelete(id);
+    
+    // Create automatic backup
+    const backupResult = await createBackup();
+    if (backupResult.success) {
+      console.log(`💾 Backup created: ${backupResult.fileName}`);
+    } else {
+      console.log(`⚠️  Backup failed: ${backupResult.error}`);
+    }
+    
+    vaultEvents.emit('recordDeleted', recordObj);
+    return recordObj;
+  } catch (error) {
+    throw new Error(`Failed to delete record: ${error.message}`);
+  }
+}
+
+async function searchRecords(searchTerm) {
+  try {
+    await connectDB();
+    if (!searchTerm || searchTerm.trim() === '') {
+      return [];
+    }
+    
+    const term = searchTerm.trim();
+    
+    // Search by name (case-insensitive) or ID
+    const records = await Record.find({
+      $or: [
+        { name: { $regex: term, $options: 'i' } },
+        { _id: term }
+      ]
+    });
+    
+    return records.map(toPlainObject);
+  } catch (error) {
+    throw new Error(`Failed to search records: ${error.message}`);
+  }
+}
+
+async function sortRecords(sortField, sortOrder) {
+  try {
+    await connectDB();
+    let sortObj = {};
+    
+    if (sortField.toLowerCase() === 'name') {
+      sortObj = { name: sortOrder.toLowerCase() === 'descending' || sortOrder.toLowerCase() === 'desc' ? -1 : 1 };
+    } else if (sortField.toLowerCase() === 'creation date' || sortField.toLowerCase() === 'date' || sortField.toLowerCase() === 'created') {
+      sortObj = { created: sortOrder.toLowerCase() === 'descending' || sortOrder.toLowerCase() === 'desc' ? -1 : 1 };
+    }
+    
+    const records = await Record.find({}).sort(sortObj);
+    return records.map(toPlainObject);
+  } catch (error) {
+    throw new Error(`Failed to sort records: ${error.message}`);
+  }
+}
+
+async function exportData() {
+  try {
+    await connectDB();
+    const records = await Record.find({});
+    const data = records.map(toPlainObject);
+    const projectRoot = path.join(__dirname, '../..');
+    const exportFile = path.join(projectRoot, 'export.txt');
+    
+    const now = new Date();
+    const exportDate = now.toLocaleDateString();
+    const exportTime = now.toLocaleTimeString();
+    const totalRecords = data.length;
+    const fileName = 'export.txt';
+    
+    let content = '';
+    content += '='.repeat(60) + '\n';
+    content += '                    VAULT DATA EXPORT\n';
+    content += '='.repeat(60) + '\n';
+    content += `Export Date: ${exportDate}\n`;
+    content += `Export Time: ${exportTime}\n`;
+    content += `Total Records: ${totalRecords}\n`;
+    content += `File Name: ${fileName}\n`;
+    content += '='.repeat(60) + '\n\n';
+    
+    if (totalRecords === 0) {
+      content += 'No records found in the vault.\n';
+    } else {
+      content += 'RECORDS:\n';
+      content += '-'.repeat(60) + '\n';
+      data.forEach((record, index) => {
+        content += `\nRecord ${index + 1}:\n`;
+        content += `  ID: ${record.id}\n`;
+        content += `  Name: ${record.name}\n`;
+        content += `  Value: ${record.value}\n`;
+        if (record.created) {
+          content += `  Created: ${record.created}\n`;
+        }
+        content += '-'.repeat(60) + '\n';
+      });
+    }
+    
+    content += '\n' + '='.repeat(60) + '\n';
+    content += `End of Export - ${totalRecords} record${totalRecords !== 1 ? 's' : ''} exported\n`;
+    content += '='.repeat(60) + '\n';
+    
     fs.writeFileSync(exportFile, content, 'utf8');
     return { success: true, filePath: exportFile };
   } catch (error) {
@@ -206,65 +226,66 @@ function exportData() {
   }
 }
 
-function getVaultStatistics() {
-  const data = fileDB.readDB();
-  const dataDir = path.join(__dirname, '..', 'data');
-  const dbFile = path.join(dataDir, 'vault.json');
-  
-  // Get file modification time
-  let lastModified = 'N/A';
+async function getVaultStatistics() {
   try {
-    const stats = fs.statSync(dbFile);
-    const modDate = new Date(stats.mtime);
-    const year = modDate.getFullYear();
-    const month = String(modDate.getMonth() + 1).padStart(2, '0');
-    const day = String(modDate.getDate()).padStart(2, '0');
-    const hours = String(modDate.getHours()).padStart(2, '0');
-    const minutes = String(modDate.getMinutes()).padStart(2, '0');
-    const seconds = String(modDate.getSeconds()).padStart(2, '0');
-    lastModified = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  } catch (error) {
-    // File doesn't exist or can't be read
-  }
-  
-  // Calculate statistics
-  const totalRecords = data.length;
-  
-  // Find longest name
-  let longestName = null;
-  let longestNameLength = 0;
-  if (totalRecords > 0) {
-    data.forEach(record => {
-      if (record.name && record.name.length > longestNameLength) {
-        longestName = record.name;
-        longestNameLength = record.name.length;
-      }
-    });
-  }
-  
-  // Find earliest and latest creation dates
-  let earliestDate = null;
-  let latestDate = null;
-  if (totalRecords > 0) {
-    const dates = data
-      .map(record => record.created)
-      .filter(date => date != null && date !== '');
+    await connectDB();
+    const records = await Record.find({});
+    const data = records.map(toPlainObject);
     
-    if (dates.length > 0) {
-      dates.sort();
-      earliestDate = dates[0];
-      latestDate = dates[dates.length - 1];
+    // Get most recent update time from MongoDB
+    let lastModified = 'N/A';
+    if (records.length > 0) {
+      const mostRecent = await Record.findOne().sort({ updatedAt: -1 });
+      if (mostRecent && mostRecent.updatedAt) {
+        const modDate = new Date(mostRecent.updatedAt);
+        const year = modDate.getFullYear();
+        const month = String(modDate.getMonth() + 1).padStart(2, '0');
+        const day = String(modDate.getDate()).padStart(2, '0');
+        const hours = String(modDate.getHours()).padStart(2, '0');
+        const minutes = String(modDate.getMinutes()).padStart(2, '0');
+        const seconds = String(modDate.getSeconds()).padStart(2, '0');
+        lastModified = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      }
     }
+    
+    const totalRecords = data.length;
+    
+    let longestName = null;
+    let longestNameLength = 0;
+    if (totalRecords > 0) {
+      data.forEach(record => {
+        if (record.name && record.name.length > longestNameLength) {
+          longestName = record.name;
+          longestNameLength = record.name.length;
+        }
+      });
+    }
+    
+    let earliestDate = null;
+    let latestDate = null;
+    if (totalRecords > 0) {
+      const dates = data
+        .map(record => record.created)
+        .filter(date => date != null && date !== '');
+      
+      if (dates.length > 0) {
+        dates.sort();
+        earliestDate = dates[0];
+        latestDate = dates[dates.length - 1];
+      }
+    }
+    
+    return {
+      totalRecords,
+      lastModified,
+      longestName: longestName || 'N/A',
+      longestNameLength,
+      earliestDate: earliestDate || 'N/A',
+      latestDate: latestDate || 'N/A'
+    };
+  } catch (error) {
+    throw new Error(`Failed to get statistics: ${error.message}`);
   }
-  
-  return {
-    totalRecords,
-    lastModified,
-    longestName: longestName || 'N/A',
-    longestNameLength,
-    earliestDate: earliestDate || 'N/A',
-    latestDate: latestDate || 'N/A'
-  };
 }
 
 module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData, createBackup, getVaultStatistics };

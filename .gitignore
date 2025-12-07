@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+
+# MongoDB connection strings (if hardcoded)
+**/mongodb.js
+!SCDProject25/db/mongodb.js
+
+# Backup files
+backups/
+*.backup
+
+# Export files
+export.txt
+
+# Data files (if keeping file-based as backup)
+SCDProject25/data/vault.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
