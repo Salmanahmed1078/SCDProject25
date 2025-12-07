@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Al-Dar Apparel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="assets/images/aldar-logo.png" alt="Al-Dar Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo" style="display: none;">AL-DAR</div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li class="nav-dropdown">
+                    <a href="men.html">For Him <span class="dropdown-arrow">▼</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="men.html">Men's Collection</a></li>
+                        <li><a href="men.html#formal">Formal Thobes</a></li>
+                        <li><a href="men.html#evening">Evening Thobes</a></li>
+                        <li><a href="men.html#casual">Casual Thobes</a></li>
+                    </ul>
+                </li>
+                <li class="nav-dropdown">
+                    <a href="women.html">For Her <span class="dropdown-arrow">▼</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="women.html">Women's Collection</a></li>
+                        <li><a href="women.html#formal">Formal Abayas</a></li>
+                        <li><a href="women.html#evening">Evening Abayas</a></li>
+                        <li><a href="women.html#casual">Casual Abayas</a></li>
+                    </ul>
+                </li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <span class="icon">🔍</span>
+                <span class="icon">♡</span>
+                <a href="cart.html" class="icon cart-icon" id="cart-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM1 2V4H3L6.6 11.59L5.25 14.04C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.28 15 7.17 14.89 7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L20.88 5.48C20.96 5.34 21 5.17 21 5C21 4.45 20.55 4 20 4H5.21L4.27 2H1ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18Z" fill="currentColor"/>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </a>
+                <span class="icon menu-toggle">☰</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <div class="breadcrumb-container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    Home > Contact
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Contact Header -->
+    <section class="contact-header">
+        <h1>Contact Us</h1>
+        <p class="main-subtitle">Ready to Create Your Own Thobe Brand?</p>
+        <p class="subtitle">Connect with us to discover how we can help you make that happen.</p>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <!-- Left Column -->
+            <div class="contact-left">
+                <h2>Get in Touch</h2>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-button">
+                        SEND MESSAGE
+                        <img src="assets/images/arrow-right.svg" alt="Send" class="button-icon">
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column -->
+            <div class="contact-right">
+                <h2>Contact Information</h2>
+                <div class="contact-info">
+                    <div class="info-item">
+                        <h3>Phone</h3>
+                        <p>+971 4 353 2519</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Email</h3>
+                        <p>hello@aldarapparel.com</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Address</h3>
+                        <p>Ali Bin Abi Talib Road, Near Dubai Museum, Bur Dubai, Dubai, United Arab Emirates</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Social Media</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link">Facebook</a>
+                            <a href="#" class="social-link">Instagram</a>
+                            <a href="#" class="social-link">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-placeholder">
+                    <img src="assets/images/map.jpg" alt="Map Placeholder">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Left: Logo + Social -->
+            <div class="footer-left">
+                <img src="assets/images/aldar-logo.png" alt="Al-Dar Logo" class="footer-logo-img">
+                <div class="footer-social">
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M14 8V6C14 5.44772 14.4477 5 15 5H16V2H13C11.3431 2 10 3.34315 10 5V8H7V11H10V22H14V11H16L17 8H14Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="5" y="9" width="3" height="11" fill="currentColor"/>
+                            <circle cx="6.5" cy="6" r="1.5" fill="currentColor"/>
+                            <path d="M12 9V20M12 13C12 11 13 9 16 9C18 9 19 10 19 13V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <!-- Right: Nav + Contact -->
+            <div class="footer-right">
+                <nav class="footer-nav">
+                    <a href="index.html" class="footer-nav-link">Home</a>
+                    <a href="about.html" class="footer-nav-link">About</a>
+                    <a href="#gallery" class="footer-nav-link">Gallery</a>
+                    <a href="contact.html" class="footer-nav-link active">Contact Us</a>
+                </nav>
+                <div class="footer-contact">
+                    <div class="footer-contact-item">
+                        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 10.999H22C22 5.869 18.127 2 12.99 2V4C17.052 4 20 6.943 20 10.999Z" fill="currentColor"/>
+                            <path d="M13 8.00024C15.103 8.00024 16 8.89724 16 11.0002H18C18 7.77524 16.225 6.00024 13 6.00024V8.00024Z" fill="currentColor"/>
+                            <path d="M16.422 13.443C16.2299 13.2683 15.9774 13.1752 15.7178 13.1832C15.4583 13.1912 15.212 13.2998 15.031 13.486L12.638 15.947C12.062 15.837 10.904 15.476 9.71198 14.287C8.51998 13.094 8.15898 11.933 8.05198 11.361L10.511 8.96699C10.6974 8.78612 10.8061 8.53982 10.8141 8.2802C10.8222 8.02059 10.7289 7.768 10.554 7.57599L6.85898 3.51299C6.68394 3.32035 6.44453 3.2035 6.18918 3.18725C5.93382 3.17101 5.68179 3.25665 5.48498 3.42599L3.29798 5.28699C3.12502 5.46051 3.0222 5.69145 3.00798 5.93599C2.99298 6.18599 2.70698 12.108 7.29898 16.702C11.305 20.707 16.323 21 17.705 21C17.907 21 18.031 20.994 18.064 20.992C18.3085 20.9783 18.5394 20.8747 18.712 20.701L20.572 18.514C20.7414 18.3174 20.8273 18.0654 20.8113 17.81C20.7952 17.5546 20.6785 17.3151 20.486 17.14L16.422 13.443Z" fill="currentColor"/>
+                        </svg>
+                        <span>+971 4 353 2519</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="currentColor"/>
+                        </svg>
+                        <span>hello@aldarapparel.com</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="currentColor"/>
+                        </svg>
+                        <span>Ali Bin Abi Talib Road, Near Dubai Museum, Bur Dubai, Dubai, United Arab Emirates</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; Al-Dar Apparel 1900-2025. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>
+

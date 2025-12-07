@@ -1,0 +1,517 @@
+/* Al-Dar Apparel - Responsive Styles */
+/* Section Headers */
+.section-header h2.section-title,
+.section-header .section-title {
+    font-size: 45px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--primary-black);
+    margin-bottom: 15px;
+    text-transform: capitalize;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .section-header h2.section-title,
+    .section-header .section-title {
+        font-size: 40px;
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .section-header h2.section-title,
+    .section-header .section-title {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+}
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .brand-name {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+    }
+
+    .why-aldar-content {
+        gap: 30px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 30px;
+    }
+
+    .contact-container {
+        gap: 40px;
+    }
+}
+
+/* Mobile and Tablet Styles */
+@media (max-width: 768px) {
+    /* Navigation */
+    .navbar {
+        position: fixed;
+        background-color: var(--primary-white);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .navbar.scrolled {
+        background-color: var(--primary-white);
+    }
+
+    .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: var(--primary-white);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 20px 0;
+        gap: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .nav-menu li a {
+        color: var(--primary-black);
+        padding: 12px 20px;
+        display: block;
+    }
+
+    .nav-menu li a:hover {
+        color: var(--accent-pink-dark);
+        background-color: var(--gray-light);
+    }
+
+    .nav-dropdown .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        background-color: var(--gray-light);
+        box-shadow: none;
+        margin-top: 0;
+        padding: 10px 0;
+        display: none;
+    }
+
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown.active .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-menu li a {
+        color: var(--text-primary);
+        padding: 10px 20px;
+    }
+
+    .dropdown-menu li a:hover {
+        background-color: var(--gray-medium);
+        color: var(--accent-pink-dark);
+        padding-left: 25px;
+    }
+
+    .dropdown-arrow {
+        color: var(--primary-black);
+    }
+
+    .menu-toggle {
+        display: block !important;
+        color: var(--primary-black);
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+
+    .menu-toggle:hover {
+        color: var(--accent-pink-dark);
+    }
+
+    /* Hero Section */
+    .hero-section {
+        min-height: 500px;
+    }
+
+    .hero-overlay {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-gender-options {
+        top: 40px;
+        left: 30px;
+        gap: 25px;
+        flex-direction: row;
+    }
+
+    .gender-option {
+        font-size: 1rem;
+        letter-spacing: 0.3px;
+    }
+
+    .brand-name {
+        font-size: 1.5rem;
+    }
+
+    .brand-year {
+        font-size: 0.8rem;
+    }
+
+    .social-icons {
+        flex-direction: row;
+        margin-top: 20px;
+    }
+
+    .hero-cta {
+        bottom: 30px;
+    }
+
+    /* Gender Hero Section */
+    .gender-hero-section {
+        min-height: 500px;
+        height: 60vh;
+    }
+
+    .gender-hero-video-element {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* For Him / For Her Sections */
+    .him-her-section {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .gender-box {
+        min-height: 500px;
+    }
+
+    .gender-content {
+        bottom: 20px;
+        left: 20px;
+    }
+
+    .gender-content h2 {
+        font-size: 2rem;
+    }
+
+    /* Why Al-Dar Section */
+    .why-aldar-section {
+        padding: 60px 20px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .why-aldar-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    /* Products Page */
+    .products-header {
+        padding: 60px 20px 30px;
+    }
+
+    .products-header h1 {
+        font-size: 2rem;
+    }
+
+    .products-header p {
+        font-size: 1rem;
+    }
+
+    .category-nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .category-btn {
+        white-space: nowrap;
+        font-size: 0.9rem;
+        padding: 8px 20px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    /* About Page */
+    .about-header {
+        padding: 60px 20px 30px;
+    }
+
+    .about-header h1 {
+        font-size: 2rem;
+    }
+
+    .company-story {
+        grid-template-columns: 1fr;
+        padding: 40px 20px;
+        gap: 40px;
+    }
+
+    .story-content h2 {
+        font-size: 2rem;
+    }
+
+    .craftsmanship-section {
+        padding: 40px 20px;
+    }
+
+    .craftsmanship-section h2 {
+        font-size: 2rem;
+    }
+
+    .workshop-section {
+        padding: 40px 20px;
+    }
+
+    .workshop-images {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .workshop-content h2 {
+        font-size: 2rem;
+    }
+
+    /* Contact Page */
+    .contact-header {
+        padding: 60px 20px 30px;
+    }
+
+    .contact-header h1 {
+        font-size: 2rem;
+    }
+
+    .contact-section {
+        padding: 40px 20px;
+    }
+
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .contact-form-wrapper h2,
+    .contact-info-wrapper h2 {
+        font-size: 1.5rem;
+    }
+
+    /* Footer */
+    .footer-main {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .footer-nav {
+        justify-content: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    /* Typography Adjustments */
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0 15px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .hero-overlay {
+        padding: 15px;
+    }
+
+    .hero-gender-options {
+        gap: 20px;
+        top: 30px;
+        left: 20px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .gender-option {
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+    }
+
+    .brand-name {
+        font-size: 1.2rem;
+    }
+
+    .gender-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .placeholder-title {
+        font-size: 1rem;
+    }
+
+    .placeholder-info {
+        font-size: 0.8rem;
+    }
+}
+
+ 
+
+/* Responsive Design - Tablet */
+@media screen and (max-width: 1024px) {
+    .him-her-container {
+        padding: 0 60px;
+        gap: 25px;
+    }
+
+    .him-her-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* Responsive Design - Tablet Portrait */
+@media screen and (max-width: 768px) {
+    .him-her-showcase {
+        padding: 40px 0;
+    }
+
+    .him-her-container {
+        grid-template-columns: 1fr; /* Stack vertically on mobile */
+        gap: 20px;
+        padding: 0 24px;
+    }
+
+    .him-her-title {
+        font-size: 2rem;
+    }
+
+    .him-her-shop {
+        padding: 10px 30px;
+        font-size: 14px;
+    }
+}
+
+/* Responsive Design - Mobile */
+@media screen and (max-width: 480px) {
+    .him-her-showcase {
+        padding: 30px 0;
+    }
+
+    .him-her-container {
+        padding: 0 20px;
+        gap: 16px;
+    }
+
+    .him-her-title {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+
+    .him-her-shop {
+        padding: 8px 25px;
+        font-size: 13px;
+        letter-spacing: 1.5px;
+    }
+}
+
+/* Cart & Inquiry Responsive Styles */
+@media (max-width: 768px) {
+    .cart-inquiry-section {
+        padding: 60px 20px;
+    }
+
+    .cart-inquiry-header h1 {
+        font-size: 2rem;
+    }
+
+    .cart-subtitle {
+        font-size: 1rem;
+    }
+
+    .cart-inquiry-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .cart-designs-column h2,
+    .cart-inquiry-column h2 {
+        font-size: 1.75rem;
+    }
+
+    .cart-items-list {
+        min-height: 300px;
+        padding: 20px;
+    }
+
+    .quantity-section,
+    .inquiry-form-section {
+        padding: 20px;
+    }
+}
+
+/* Section Header Mobile Styles */
+@media (max-width: 767px) {
+    .section-header h3, 
+    .section-header .h3,
+    .section-header h2,
+    .section-header .section-title {
+        font-size: 26px;
+        line-height: 36px;
+    }
+}
