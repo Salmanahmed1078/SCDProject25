@@ -1,16 +1,21 @@
-// Load environment variables from .env file
-require('dotenv').config();
+// Load environment variables from .env file (if it exists)
+// In Docker, environment variables are passed directly, so .env is optional
+try {
+  require('dotenv').config();
+} catch (e) {
+  // dotenv not available or .env file doesn't exist - that's okay in Docker
+}
 
 const mongoose = require('mongoose');
 
 // Set mongoose options to suppress deprecation warnings
 mongoose.set('strictQuery', false);
 
-// MongoDB Atlas connection string from environment variables
-// The connection string should be set in the .env file as MONGODB_URI
-// If MONGODB_URI is not set, throw an error to ensure proper configuration
+// MongoDB connection string from environment variables
+// In Docker: passed via -e flag or docker-compose environment
+// Locally: from .env file
 if (!process.env.MONGODB_URI) {
-  throw new Error('MONGODB_URI is not defined in environment variables. Please create a .env file with your MongoDB connection string. See .env.example for reference.');
+  throw new Error('MONGODB_URI is not defined in environment variables. Please set it in .env file (local) or pass via -e flag (Docker).');
 }
 
 const MONGODB_URI = process.env.MONGODB_URI;

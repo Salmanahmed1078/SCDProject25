@@ -1,20 +1,17 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: nodevault
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-nodevault}
     volumes:
       - mongodb_data:/data/db
     networks:
       - nodevault-network
+    # No ports exposed - container is private
 
   backend:
     build:
@@ -25,8 +22,8 @@ services:
     depends_on:
       - mongodb
     environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:password@mongodb:27017/nodevault?authSource=admin
+      - NODE_ENV=${NODE_ENV:-production}
+      - MONGODB_URI=${MONGODB_URI}
     networks:
       - nodevault-network
     stdin_open: true
@@ -34,8 +31,8 @@ services:
 
 volumes:
   mongodb_data:
+    driver: local
 
 networks:
   nodevault-network:
     driver: bridge
-
