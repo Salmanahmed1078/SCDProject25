@@ -206,4 +206,65 @@ function exportData() {
   }
 }
 
-module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData, createBackup };
+function getVaultStatistics() {
+  const data = fileDB.readDB();
+  const dataDir = path.join(__dirname, '..', 'data');
+  const dbFile = path.join(dataDir, 'vault.json');
+  
+  // Get file modification time
+  let lastModified = 'N/A';
+  try {
+    const stats = fs.statSync(dbFile);
+    const modDate = new Date(stats.mtime);
+    const year = modDate.getFullYear();
+    const month = String(modDate.getMonth() + 1).padStart(2, '0');
+    const day = String(modDate.getDate()).padStart(2, '0');
+    const hours = String(modDate.getHours()).padStart(2, '0');
+    const minutes = String(modDate.getMinutes()).padStart(2, '0');
+    const seconds = String(modDate.getSeconds()).padStart(2, '0');
+    lastModified = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  } catch (error) {
+    // File doesn't exist or can't be read
+  }
+  
+  // Calculate statistics
+  const totalRecords = data.length;
+  
+  // Find longest name
+  let longestName = null;
+  let longestNameLength = 0;
+  if (totalRecords > 0) {
+    data.forEach(record => {
+      if (record.name && record.name.length > longestNameLength) {
+        longestName = record.name;
+        longestNameLength = record.name.length;
+      }
+    });
+  }
+  
+  // Find earliest and latest creation dates
+  let earliestDate = null;
+  let latestDate = null;
+  if (totalRecords > 0) {
+    const dates = data
+      .map(record => record.created)
+      .filter(date => date != null && date !== '');
+    
+    if (dates.length > 0) {
+      dates.sort();
+      earliestDate = dates[0];
+      latestDate = dates[dates.length - 1];
+    }
+  }
+  
+  return {
+    totalRecords,
+    lastModified,
+    longestName: longestName || 'N/A',
+    longestNameLength,
+    earliestDate: earliestDate || 'N/A',
+    latestDate: latestDate || 'N/A'
+  };
+}
+
+module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData, createBackup, getVaultStatistics };

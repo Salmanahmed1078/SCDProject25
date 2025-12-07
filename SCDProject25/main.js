@@ -17,7 +17,8 @@ function menu() {
 5. Search Records
 6. Sort Records
 7. Export Data
-8. Exit
+8. View Vault Statistics
+9. Exit
 =====================
   `);
 
@@ -104,6 +105,23 @@ function menu() {
         break;
 
       case '8':
+        const stats = db.getVaultStatistics();
+        console.log('\nVault Statistics:');
+        console.log('--------------------------');
+        console.log(`Total Records: ${stats.totalRecords}`);
+        console.log(`Last Modified: ${stats.lastModified}`);
+        if (stats.longestName !== 'N/A') {
+          console.log(`Longest Name: ${stats.longestName} (${stats.longestNameLength} characters)`);
+        } else {
+          console.log(`Longest Name: ${stats.longestName}`);
+        }
+        console.log(`Earliest Record: ${stats.earliestDate}`);
+        console.log(`Latest Record: ${stats.latestDate}`);
+        console.log('--------------------------\n');
+        menu();
+        break;
+
+      case '9':
         console.log('👋 Exiting NodeVault...');
         rl.close();
         break;
