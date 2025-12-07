@@ -1,17 +1,19 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const mongoose = require('mongoose');
 
-// Try to load dotenv if available (optional)
-try {
-  require('dotenv').config();
-} catch (e) {
-  // dotenv not installed, that's okay
+// Set mongoose options to suppress deprecation warnings
+mongoose.set('strictQuery', false);
+
+// MongoDB Atlas connection string from environment variables
+// The connection string should be set in the .env file as MONGODB_URI
+// If MONGODB_URI is not set, throw an error to ensure proper configuration
+if (!process.env.MONGODB_URI) {
+  throw new Error('MONGODB_URI is not defined in environment variables. Please create a .env file with your MongoDB connection string. See .env.example for reference.');
 }
 
-// MongoDB Atlas connection string
-// Option 1: Use environment variable MONGODB_URI (recommended)
-// Option 2: Replace the hardcoded string below with your connection string
-// Format: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://<username>:<password>@<cluster>.mongodb.net/nodevault?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 let isConnected = false;
 

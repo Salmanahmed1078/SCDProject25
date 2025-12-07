@@ -1,3 +1,6 @@
+// Load environment variables from .env file first
+require('dotenv').config();
+
 const readline = require('readline');
 const db = require('./db');
 const { connectDB } = require('./db/mongodb');
