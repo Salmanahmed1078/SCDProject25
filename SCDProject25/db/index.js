@@ -4,6 +4,43 @@ const fileDB = require('./file');
 const recordUtils = require('./record');
 const vaultEvents = require('../events');
 
+// Backup directory path (relative to project root)
+const projectRoot = path.join(__dirname, '../..');
+const backupsDir = path.join(projectRoot, 'backups');
+
+// Ensure backups directory exists
+if (!fs.existsSync(backupsDir)) {
+  fs.mkdirSync(backupsDir, { recursive: true });
+}
+
+function createBackup() {
+  try {
+    const data = fileDB.readDB();
+    
+    // Generate backup filename with date and time
+    // Format: backup_2025-11-04_15-22-10.json (or with milliseconds if needed)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+    
+    // Include milliseconds to ensure uniqueness
+    const backupFileName = `backup_${year}-${month}-${day}_${hours}-${minutes}-${seconds}-${milliseconds}.json`;
+    const backupFilePath = path.join(backupsDir, backupFileName);
+    
+    // Write the backup file with the current vault state
+    fs.writeFileSync(backupFilePath, JSON.stringify(data, null, 2), 'utf8');
+    
+    return { success: true, filePath: backupFilePath, fileName: backupFileName };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 function addRecord({ name, value }) {
   recordUtils.validateRecord({ name, value });
   const data = fileDB.readDB();
@@ -15,6 +52,15 @@ function addRecord({ name, value }) {
   };
   data.push(newRecord);
   fileDB.writeDB(data);
+  
+  // Create automatic backup
+  const backupResult = createBackup();
+  if (backupResult.success) {
+    console.log(`💾 Backup created: ${backupResult.fileName}`);
+  } else {
+    console.log(`⚠️  Backup failed: ${backupResult.error}`);
+  }
+  
   vaultEvents.emit('recordAdded', newRecord);
   return newRecord;
 }
@@ -40,6 +86,15 @@ function deleteRecord(id) {
   if (!record) return null;
   data = data.filter(r => r.id !== id);
   fileDB.writeDB(data);
+  
+  // Create automatic backup
+  const backupResult = createBackup();
+  if (backupResult.success) {
+    console.log(`💾 Backup created: ${backupResult.fileName}`);
+  } else {
+    console.log(`⚠️  Backup failed: ${backupResult.error}`);
+  }
+  
   vaultEvents.emit('recordDeleted', record);
   return record;
 }
@@ -151,4 +206,4 @@ function exportData() {
   }
 }
 
-module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData };
+module.exports = { addRecord, listRecords, updateRecord, deleteRecord, searchRecords, sortRecords, exportData, createBackup };
