@@ -1,0 +1,16 @@
+{
+  "name": "project-scd-task-2",
+  "version": "1.0.0",
+  "description": "NodeVault - A simple record management system",
+  "main": "SCDProject25/main.js",
+  "scripts": {
+    "start": "node SCDProject25/main.js",
+    "version:patch": "npm version patch -m 'Version %s - Patch release'",
+    "version:minor": "npm version minor -m 'Version %s - Minor release'",
+    "version:major": "npm version major -m 'Version %s - Major release'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
