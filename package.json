@@ -1,6 +1,6 @@
 {
   "name": "project-scd-task-2",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "NodeVault - A simple record management system",
   "main": "SCDProject25/main.js",
   "scripts": {
