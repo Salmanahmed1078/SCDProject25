@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Lint, format-check, audit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x, 20.x ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Lint (ESLint)
+        run: |
+          if npm run -s | grep -q "^  lint"; then
+            npm run lint
+          elif npx --yes eslint -v >/dev/null 2>&1; then
+            npx --yes eslint . --max-warnings=0 || true
+          else
+            echo "ESLint not configured; skipping."
+          fi
+
+      - name: Format check (Prettier)
+        run: |
+          if npm run -s | grep -q "^  format:check"; then
+            npm run format:check
+          elif npx --yes prettier -v >/dev/null 2>&1; then
+            npx --yes prettier . -c || true
+          else
+            echo "Prettier not configured; skipping."
+          fi
+
+      - name: Security audit (npm)
+        run: |
+          npm audit --audit-level=high || true
+          npm audit --json > npm-audit.json || true
+
+      - name: Basic run check
+        run: |
+          node -e "require.resolve('./run.js')"
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
+          if-no-files-found: ignore
+
+

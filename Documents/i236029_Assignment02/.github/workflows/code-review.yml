@@ -1,0 +1,106 @@
+name: Code Review Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  lint-and-format:
+    name: ESLint and Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Lint (ESLint)
+        run: |
+          if npm run -s | grep -q "^  lint"; then
+            npm run lint
+          elif npx --yes eslint -v >/dev/null 2>&1; then
+            npx --yes eslint . --max-warnings=0 || true
+          else
+            echo "ESLint not configured; skipping."
+          fi
+
+      - name: Format check (Prettier)
+        run: |
+          if npm run -s | grep -q "^  format:check"; then
+            npm run format:check
+          elif npx --yes prettier -v >/dev/null 2>&1; then
+            npx --yes prettier . -c || true
+          else
+            echo "Prettier not configured; skipping."
+          fi
+
+  npm-audit:
+    name: npm audit (high severity)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=high || true
+          npm audit --json > npm-audit.json || true
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-npm-audit-report
+          path: npm-audit.json
+          if-no-files-found: ignore
+
+  codeql:
+    name: CodeQL (JavaScript)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+
